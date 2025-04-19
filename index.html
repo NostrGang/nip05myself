@@ -1,11 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>NostrGang</title>
-    </head>
-    <body>
-      <h1>Welcome to NostrGang</h1>
-      <p>More coming soon...</p>
-      </body>
-      </html>
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #2a0047, #ff7c00);
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+        padding: 2rem;
+        background-attachment: fixed;
+        }
+
+      h1 {
+        font-size: 3.5rem;
+        margin-bottom: 0.5rem;
+        }
+
+      h1 span {
+        color: #ff7c00;
+        }
+      p {
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin-bottom: 2rem;
+        }
+
+      .btn {
+        background: #ff7c00;
+        color: #fff;
+        padding: 0.8rem 1.6rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.3s ease;
+        }
+      .btn:hover {
+        background: #e56600;
+        }
+      .footer {
+        margin-top: 3rem;
+        font-size: 0.9rem;
+        color: #ddd;
+        }
+      @media (max-width: 600px) {
+        h1 { font-size: 2.5rem; }
+        p { font-size: 1rem; }
+        }
+      </style>
+      </head>
+      <body>
+        <h1><span>NostrGang</span></h1>
+        <p>Get your own NIP-05 address like <strong>yourname@nostrgang.com</strong> for just
+          <strong>1,000 sats</strong>.</p>
+          <p>Send sats to <strong>lightning:nostrgang.com</strong> and stay tuned — submission
+            form coming soon!</p>
+            <a class="btn" href="lightning:nostrgang.com">Pay Now</a>
+
+        <div class="footer">
+          Built with love & lightning | nostr@nostrgang.com
+          </div>
+          </body>
+          </html>
