@@ -43,7 +43,106 @@
      href="lightning:nostrgang@nostrgang.com">
     Pay Now
   </a>
+ <!-- ==== LIVE NOSTR FEED (starts right after the button) ==== -->
+  <div class="nostr-feed">
+    <p class="feed-title">🪂 Latest posts from NIP‑05 users @nostrgang.com</p>
+    <ul id="feed-list" class="feed-list"></ul>
+  </div>
 
+  <!-- ------------------------------------------------------------
+       JavaScript – loads nostr-tools, fetches the NIP‑05 list,
+       subscribes to all those pubkeys, and renders the feed.
+       ------------------------------------------------------------ -->
+  <script src="https://cdn.jsdelivr.net/npm/nostr-tools@1.17.0/dist/nostr-tools.min.js"></script>
+  <script>
+    /* ---------- CONFIGURATION ---------- */
+    const NIP05_URL = "https://nostrgang.com/.well-known/nostr.json"; // <-- static file you already host
+    const RELAYS = [
+      "wss://relay.damus.io",
+      "wss://nos.lol",
+      "wss://relay.nostr.band"
+    ];
+    const MAX_EVENTS = 10;   // how many recent notes to keep on screen
+
+    /* ---------- HELPERS ---------- */
+    // Human‑readable “time ago”
+    function timeAgo(ts) {
+      const now = Date.now() / 1000;
+      const diff = Math.round(now - ts);
+      if (diff < 60) return `${diff}s ago`;
+      if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+      return `${Math.floor(diff/86400)}d ago`;
+    }
+
+    // Render the array of events into the UL
+    function render(events) {
+      const ul = document.getElementById('feed-list');
+      ul.innerHTML = '';
+      events.forEach(ev => {
+        const li = document.createElement('li');
+        const txt = document.createElement('span');
+        txt.textContent = ev.content;
+        li.appendChild(txt);
+
+        const ts = document.createElement('span');
+        ts.className = 'time';
+        ts.textContent = timeAgo(ev.created_at);
+        li.appendChild(ts);
+
+        ul.appendChild(li);
+      });
+    }
+
+    /* ---------- MAIN LOGIC ---------- */
+    (async () => {
+      // 1️⃣ Fetch the NIP‑05 JSON that maps names → npubs
+      const resp = await fetch(NIP05_URL);
+      if (!resp.ok) {
+        console.error('Failed to load NIP‑05 file');
+        return;
+      }
+      const nip05 = await resp.json(); // { "names": { "alice": "npub1...", ... } }
+
+      // 2️⃣ Extract all hex pubkeys from the mapping
+      const nameMap = nip05.names || {};
+      const pubkeysHex = Object.values(nameMap).map(npub => {
+        // npub → hex (nostr-tools helper)
+        try { return nip19.decode(npub).data; }
+        catch (e) { console.warn('Invalid npub:', npub); return null; }
+      }).filter(Boolean);
+
+      if (pubkeysHex.length === 0) {
+        console.warn('No valid pubkeys found in NIP‑05 file');
+        return;
+      }
+
+      // 3️⃣ Set up a pool (auto‑reconnect, multiple relays)
+      const pool = new nostr.Pool();
+
+      // 4️⃣ Subscribe to kind=1 (text notes) from *all* those pubkeys
+      const sub = pool.sub(
+        RELAYS,
+        [{ kinds: [1], authors: pubkeysHex }],
+        { unsubscribeOnEose: false }   // stay alive for new notes
+      );
+
+      const events = [];   // will hold the newest notes (sorted newest‑first)
+
+      sub.on('event', ev => {
+        // Insert newest at the front
+        events.unshift(ev);
+        // Keep only the most recent MAX_EVENTS
+        if (events.length > MAX_EVENTS) events.pop();
+        render(events);
+      });
+
+      // Optional: clean up when the page is closed
+      window.addEventListener('beforeunload', () => sub.unsub());
+    })();
+  </script>
+</body>
+</html>
   <div class="footer">
     Built with love &amp; lightning | Nostr Gang
   </div>
