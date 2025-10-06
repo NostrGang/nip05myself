@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+d<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>NostrGang – Pay with Lightning</title>
   <style>
+    /* -------------------- Page layout -------------------- */
     body{
       margin:0;
       font-family:'Helvetica Neue',Arial,sans-serif;
@@ -18,41 +19,32 @@
       padding:2rem;
     }
     h1{font-size:3rem;margin-bottom:.5rem;}
-    p{font-size:1.2rem;max-width:600px;margin-bottom:2rem;}
+    p{
+      font-size:1.2rem;
+      max-width:600px;
+      margin-bottom:2rem;
+      line-height:1.5;
+    }
     .btn{
-      background:#ff7c00;color:#fff;padding:.8rem 1.6rem;
-      border:none;border-radius:8px;font-size:1rem;
-      text-decoration:none;cursor:pointer;transition:.3s;
+      background:#ff7c00;
+      color:#fff;
+      padding:.8rem 1.6rem;
+      border:none;
+      border-radius:8px;
+      font-size:1rem;
+      text-decoration:none;
+      cursor:pointer;
+      transition:.3s;
     }
     .btn:hover{background:#e56600;}
-    .nostr-feed{
-      background:rgba(255,255,255,0.07);
-      border-radius:12px;
-      padding:1.2rem;
-      max-width:380px;
-      margin-top:2rem;
-      text-align:left;
-    }
-    .feed-title{
-      font-weight:600;margin-bottom:.6rem;font-size:1rem;
-      color:#ff7c00;
-    }
-    .feed-list{
-      list-style:none;margin:0;padding:0;
-    }
-    .feed-list li{
-      background:rgba(0,0,0,0.15);
-      border-radius:8px;
-      padding:.6rem .8rem;
-      margin-bottom:.5rem;
-      font-size:.93rem;line-height:1.4;
-      word-break:break-word;
-    }
-    .feed-list li .time{
-      display:block;font-size:.78rem;color:#ccc;margin-top:.3rem;
+    .footer{
+      margin-top:3rem;
+      font-size:.9rem;
+      color:#ddd;
     }
   </style>
 </head>
+
 <body>
   <h1><span style="color:#ff7c00;">NostrGang</span></h1>
 
@@ -64,95 +56,12 @@
     Send sats to <strong>nostrgang.com</strong> — click the button below and your wallet will create a fresh invoice automatically.
   </p>
 
-  <!-- ---- Pay‑Now button (replace YOUR_LIGHTNING_ADDRESS) ---- -->
+  <!-- ==== PAY NOW BUTTON ==== -->
+  <!-- Replace YOUR_LIGHTNING_ADDRESS with your actual Lightning invoice address (e.g. lnurl, lnbc…) -->
   <a class="btn" href="lightning:nostrgang@nostrgang.com">Pay Now</a>
 
-  <!-- ---- Live Nostr feed (starts right after the button) ---- -->
-  <div class="nostr-feed">
-    <p class="feed-title">🪂 Latest posts from NIP‑05 users @nostrgang.com</p>
-    <ul id="feed-list" class="feed-list"></ul>
+  <div class="footer">
+    Built with love &amp; lightning | Nostr Gang
   </div>
-
-  <!-- ------------------------------------------------------------
-       JavaScript – loads nostr-tools, fetches the NIP‑05 list,
-       subscribes to all those pubkeys, and renders the feed.
-       ------------------------------------------------------------ -->
-  <script src="https://cdn.jsdelivr.net/npm/nostr-tools@1.17.0/dist/nostr-tools.min.js"></script>
-  <script>
-    const NIP05_URL = "https://nostrgang.com/.well-known/nostr.json";
-    const RELAYS = [
-      "wss://relay.damus.io",
-      "wss://nos.lol",
-      "wss://relay.primal.net"
-      "wss://relay.nostr.band"
-    ];
-    const MAX_EVENTS = 10;
-
-    function timeAgo(ts){
-      const now = Date.now()/1000;
-      const diff = Math.round(now-ts);
-      if (diff<60) return `${diff}s ago`;
-      if (diff<3600) return `${Math.floor(diff/60)}m ago`;
-      if (diff<86400) return `${Math.floor(diff/3600)}h ago`;
-      return `${Math.floor(diff/86400)}d ago`;
-    }
-
-    function render(events){
-      const ul = document.getElementById('feed-list');
-      ul.innerHTML = '';
-      events.forEach(ev=>{
-        const li = document.createElement('li');
-        const txt = document.createElement('span');
-        txt.textContent = ev.content;
-        li.appendChild(txt);
-        const ts = document.createElement('span');
-        ts.className='time';
-        ts.textContent = timeAgo(ev.created_at);
-        li.appendChild(ts);
-        ul.appendChild(li);
-      });
-    }
-
-    (async ()=>{
-      let nip05;
-      try{
-        const r = await fetch(NIP05_URL);
-        if(!r.ok) throw new Error(`HTTP ${r.status}`);
-        nip05 = await r.json();
-      }catch(e){
-        console.error('Failed to load NIP‑05 file:',e);
-        return;
-      }
-
-      const nameMap = nip05.names||{};
-      const pubkeysHex = Object.values(nameMap).map(npub=>{
-        try{ return nip19.decode(npub).data; }
-        catch(e){ console.warn('Invalid npub in NIP‑05:',npub); return null; }
-      }).filter(Boolean);
-
-      if(pubkeysHex.length===0){
-        console.warn('No valid pubkeys found in NIP‑05 file.');
-        return;
-      }
-
-      const pool = new nostr.Pool();
-      const sub = pool.sub(
-        RELAYS,
-        [{kinds:[1],authors:pubkeysHex}],
-        {unsubscribeOnEose:false}
-      );
-
-      const events = [];
-      sub.on('event',ev=>{
-        // Uncomment the next line if you want to hide replies/quotes:
-        // if(ev.tags.some(t=>t[0]==='e')) return;
-        events.unshift(ev);
-        if(events.length>MAX_EVENTS) events.pop();
-        render(events);
-      });
-
-      window.addEventListener('beforeunload',()=>sub.unsub());
-    })();
-  </script>
 </body>
 </html>
