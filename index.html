@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>NostrGang – Pay with Lightning</title>
   <style>
+    /* -------------------- Page layout -------------------- */
     body{
       margin:0;
       font-family:'Helvetica Neue',Arial,sans-serif;
@@ -25,9 +26,37 @@
       text-decoration:none;cursor:pointer;transition:.3s;
     }
     .btn:hover{background:#e56600;}
-    .footer{margin-top:3rem;font-size:.9rem;color:#ddd;}
+
+    /* -------------------- Live Nostr feed -------------------- */
+    .nostr-feed{
+      background:rgba(255,255,255,0.07);
+      border-radius:12px;
+      padding:1.2rem;
+      max-width:380px;
+      margin-top:2rem;
+      text-align:left;
+    }
+    .feed-title{
+      font-weight:600;margin-bottom:.6rem;font-size:1rem;
+      color:#ff7c00;
+    }
+    .feed-list{
+      list-style:none;margin:0;padding:0;
+    }
+    .feed-list li{
+      background:rgba(0,0,0,0.15);
+      border-radius:8px;
+      padding:.6rem .8rem;
+      margin-bottom:.5rem;
+      font-size:.93rem;line-height:1.4;
+      word-break:break-word;
+    }
+    .feed-list li .time{
+      display:block;font-size:.78rem;color:#ccc;margin-top:.3rem;
+    }
   </style>
 </head>
+
 <body>
   <h1><span style="color:#ff7c00;">NostrGang</span></h1>
 
@@ -39,11 +68,11 @@
     Send sats to <strong>nostrgang.com</strong> — click the button below and your wallet will create a fresh invoice automatically.
   </p>
 
-  <a class="btn"
-     href="lightning:nostrgang@nostrgang.com">
-    Pay Now
-  </a>
- <!-- ==== LIVE NOSTR FEED (starts right after the button) ==== -->
+  <!-- ===================== PAY NOW BUTTON ===================== -->
+  <!-- Replace YOUR_LIGHTNING_ADDRESS with your actual Lightning invoice address (e.g. lnurl, lnbc…) -->
+  <a class="btn" href="lightning:nostrgang@nostrgang.com">Pay Now</a>
+
+  <!-- ===================== LIVE NOSTR FEED ===================== -->
   <div class="nostr-feed">
     <p class="feed-title">🪂 Latest posts from NIP‑05 users @nostrgang.com</p>
     <ul id="feed-list" class="feed-list"></ul>
@@ -53,20 +82,100 @@
        JavaScript – loads nostr-tools, fetches the NIP‑05 list,
        subscribes to all those pubkeys, and renders the feed.
        ------------------------------------------------------------ -->
- <script src="https://cdn.jsdelivr.net/npm/nostr-tools@1.17.0/dist/nostr-tools.min.js"></script>
-<script>
-/* ==================== CONFIG ==================== */
-const NIP05_URL = "https://nostrgang.com/.well-known/nostr.json";
+  <script src="https://cdn.jsdelivr.net/npm/nostr-tools@1.17.0/dist/nostr-tools.min.js"></script>
+  <script>
+    /* ---------- CONFIGURATION ---------- */
+    const NIP05_URL = "https://nostrgang.com/.well-known/nostr.json";
+    const RELAYS = [
+      "wss://relay.damus.io",
+      "wss://nos.lol",
+      "wss://relay.primal.net/,
+      "wss://relay.nostr.band"
+    ];
+    const MAX_EVENTS = 10;   // how many recent notes to keep on screen
 
-/* Public relays – feel free to add/remove */
-const RELAYS = [
-  "wss://relay.damus.io",
-  "wss://nos.lol",
-  "wss://relay.nostr.band"
-];
+    /* ---------- HELPERS ---------- */
+    // Human‑readable “time ago”
+    function timeAgo(ts){
+      const now = Date.now() / 1000;
+      const diff = Math.round(now - ts);
+      if (diff < 60) return `${diff}s ago`;
+      if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+      return `${Math.floor(diff/86400)}d ago`;
+    }
 
-/* How many recent notes to keep on screen */
-const MAX_EVENTS = 10;
-/* OPTIONAL: a known‑active npub you can use while debugging.
-   Set to null (or comment out) when you want the real NIP‑05 list only. */
-const TEST_NPUB = null; // e.g. "npub1jxh2kga4ve8d4ftahcqtqswvk5z5f7ya0k2kx3dm679hmw4ysesqvt62rj
+    // Render the array of events into the UL
+    function render(events){
+      const ul = document.getElementById('feed-list');
+      ul.innerHTML = '';
+      events.forEach(ev => {
+        const li = document.createElement('li');
+        const txt = document.createElement('span');
+        txt.textContent = ev.content;
+        li.appendChild(txt);
+
+        const ts = document.createElement('span');
+        ts.className = 'time';
+        ts.textContent = timeAgo(ev.created_at);
+        li.appendChild(ts);
+
+        ul.appendChild(li);
+      });
+    }
+
+    /* ---------- MAIN LOGIC ---------- */
+    (async () => {
+      // 1️⃣ Load the NIP‑05 JSON that maps names → npubs
+      let nip05;
+      try {
+        const resp = await fetch(NIP05_URL);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        nip05 = await resp.json();
+      } catch (e) {
+        console.error('Failed to load NIP‑05 file:', e);
+        return;
+      }
+
+      // 2️⃣ Extract hex pubkeys from the mapping
+      const nameMap = nip05.names || {};
+      const pubkeysHex = Object.values(nameMap).map(npub => {
+        try { return nip19.decode(npub).data; }
+        catch (e) {
+          console.warn('Invalid npub in NIP‑05:', npub);
+          return null;
+        }
+      }).filter(Boolean);
+
+      if (pubkeysHex.length === 0) {
+        console.warn('No valid pubkeys found in NIP‑05 file.');
+        return;
+      }
+
+      // 3️⃣ Set up a pool (auto‑reconnect, multiple relays)
+      const pool = new nostr.Pool();
+
+      // 4️⃣ Subscribe to kind=1 (text notes) from *all* those pubkeys
+      const sub = pool.sub(
+        RELAYS,
+        [{ kinds: [1], authors: pubkeysHex }],
+        { unsubscribeOnEose: false }   // stay alive for new notes
+      );
+
+      const events = [];   // will hold the newest notes (sorted newest‑first)
+
+      sub.on('event', ev => {
+        // If you want to hide replies/quotes, uncomment the next line:
+        // if (ev.tags.some(t=>t[0]==='e')) return;
+
+        events.unshift(ev);                     // newest at the front
+        if (events.length > MAX_EVENTS) events.pop();
+        render(events);
+      });
+
+      // Clean up when the page is closed
+      window.addEventListener('beforeunload', () => sub.unsub());
+    })();
+  </script>
+</body>
+</html>
