@@ -2,92 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NostrGang</title>
-
-  <!-- Optional: bring in the Poppins font (same as the earlier design) -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
-        rel="stylesheet">
-
+  <title>NostrGang – Pay with Lightning</title>
   <style>
-    /* --------------------------------------------------------------
-       Layout & visual style – same gradient, centered content
-       -------------------------------------------------------------- */
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #2a0047, #ff7c00);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-      padding: 2rem;
+    body{
+      margin:0;
+      font-family:'Helvetica Neue',Arial,sans-serif;
+      background:linear-gradient(135deg,#2a0047,#ff7c00);
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      text-align:center;
+      padding:2rem;
     }
-
-    h1 {
-      font-size: 3.5rem;
-      margin-bottom: 0.5rem;
+    h1{font-size:3rem;margin-bottom:.5rem;}
+    p{font-size:1.2rem;max-width:600px;margin-bottom:2rem;}
+    .btn{
+      background:#ff7c00;color:#fff;padding:.8rem 1.6rem;
+      border:none;border-radius:8px;font-size:1rem;
+      text-decoration:none;cursor:pointer;transition:.3s;
     }
-    h1 span { color: #ff7c00; }
-
-    p {
-      font-size: 1.2rem;
-      max-width: 600px;
-      margin-bottom: 2rem;
-      line-height: 1.5;
-    }
-
-    .btn {
-      background: #ff7c00;
-      color: #fff;
-      padding: 0.8rem 1.6rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.3s ease;
-    }
-    .btn:hover { background: #e56600; }
-
-    .footer {
-      margin-top: 3rem;
-      font-size: 0.9rem;
-      color: #ddd;
-    }
-
-    @media (max-width: 600px) {
-      h1 { font-size: 2.5rem; }
-      p  { font-size: 1rem; }
-    }
+    .btn:hover{background:#e56600;}
+    .footer{margin-top:3rem;font-size:.9rem;color:#ddd;}
   </style>
 </head>
-
 <body>
-  <!-- Brand heading -->
-  <h1><span>NostrGang</span></h1>
+  <h1><span style="color:#ff7c00;">NostrGang</span></h1>
 
-  <!-- Core pitch -->
   <p>
-    Get your own NIP‑05 address like <strong>yourname@nostrgang.com</strong>
-    for just <strong>1,000 sats</strong>.
+    Get your own NIP‑05 address like <strong>yourname@nostrgang.com</strong> for just <strong>1,000 sats</strong>.
   </p>
 
-  <!-- Payment instruction -->
   <p>
-    Send sats to <strong>nostrgang.com</strong> and stay tuned —
-    submission form coming soon!
+    Send sats to <strong>nostrgang.com</strong> — click the button below and your wallet will create a fresh invoice automatically.
   </p>
 
-  <!-- CTA button – opens any Lightning‑wallet that handles the scheme -->
-  <a class="btn" href="lightning:nostrgang.com">Pay Now</a>
+  <a class="btn"
+     href="lightning:nostrgang@nostrgang.com">
+    Pay Now
+  </a>
 
-  <!-- Footer -->
   <div class="footer">
-    Built with love &amp; lightning | nostrgang@nostrgang.com
+    Built with love &amp; lightning | Nostr Gang
   </div>
 </body>
 </html>
