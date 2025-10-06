@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NostrGang</title>
 
-  <!-- Google Font (optional – you can remove if you prefer the system font) -->
+  <!-- Optional: bring in the Poppins font (same as the earlier design) -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
         rel="stylesheet">
 
   <style>
     /* --------------------------------------------------------------
-       Global layout & typography
+       Layout & visual style – same gradient, centered content
        -------------------------------------------------------------- */
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #2a0047, #ff7c00);
-      color: #ffffff;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -25,16 +25,13 @@
       min-height: 100vh;
       text-align: center;
       padding: 2rem;
-      background-attachment: fixed;
     }
 
     h1 {
       font-size: 3.5rem;
       margin-bottom: 0.5rem;
     }
-    h1 span {
-      color: #ff7c00;
-    }
+    h1 span { color: #ff7c00; }
 
     p {
       font-size: 1.2rem;
@@ -43,9 +40,6 @@
       line-height: 1.5;
     }
 
-    /* --------------------------------------------------------------
-       Call‑to‑action button
-       -------------------------------------------------------------- */
     .btn {
       background: #ff7c00;
       color: #fff;
@@ -57,22 +51,14 @@
       text-decoration: none;
       transition: background 0.3s ease;
     }
-    .btn:hover {
-      background: #e56600;
-    }
+    .btn:hover { background: #e56600; }
 
-    /* --------------------------------------------------------------
-       Footer
-       -------------------------------------------------------------- */
     .footer {
       margin-top: 3rem;
       font-size: 0.9rem;
       color: #ddd;
     }
 
-    /* --------------------------------------------------------------
-       Responsive tweaks
-       -------------------------------------------------------------- */
     @media (max-width: 600px) {
       h1 { font-size: 2.5rem; }
       p  { font-size: 1rem; }
@@ -84,7 +70,7 @@
   <!-- Brand heading -->
   <h1><span>NostrGang</span></h1>
 
-  <!-- Main pitch -->
+  <!-- Core pitch -->
   <p>
     Get your own NIP‑05 address like <strong>yourname@nostrgang.com</strong>
     for just <strong>1,000 sats</strong>.
@@ -96,7 +82,7 @@
     submission form coming soon!
   </p>
 
-  <!-- CTA button (opens a Lightning‑wallet app) -->
+  <!-- CTA button – opens any Lightning‑wallet that handles the scheme -->
   <a class="btn" href="lightning:nostrgang.com">Pay Now</a>
 
   <!-- Footer -->
