@@ -83,35 +83,23 @@
   <!-- ==== PAY NOW BUTTON ==== -->
   <a class="btn" href="lightning:nostrgang@nostrgang.com">Pay Now</a>
 
-  <!-- ==== QUICK LIGHTNING QR CODE ==== -->
-  <div class="lnqr-wrapper">
-    <canvas id="lnqr-canvas" aria-label="Lightning QR code"></canvas>
-    <button class="copy-btn" onclick="copyLnAddr()">Copy address</button>
-  </div>
+  <!-- ---------- Lightning‑address (LNURL‑Pay) ---------- -->
+<p style="margin-top:1.5rem;">
+  ⚡️ Pay with your Lightning wallet by using the address<br>
+  <strong>nostrgang@nostrgang.com</strong>
+</p>
 
-  <div class="footer">
-    Built with love &amp; lightning | Nostr Gang
-  </div>
+<!-- QR code (auto‑generated, no extra libs needed) -->
+<canvas id="lnqr" width="180" height="180" style="margin:auto;"></canvas>
 
-  <!-- QR‑code library (tiny CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-  <script>
-    const LN_ADDRESS = "lightning:nostrgang@nostrgang.com"; // ← replace
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+<script>
+  // The LNURL‑Pay URL we stored in the DNS TXT record
+  const LNURL = "https://lnurl.alby.com/lnurlp/abcd1234efgh5678ijkl9012mnop3456qrst7890uvwx";
 
-    // Render QR
-    const canvas = document.getElementById('lnqr-canvas');
-    QRCode.toCanvas(canvas, LN_ADDRESS, {
-      width:150,
-      color:{dark:"#ffffff",light:"#00000000"}
-    }).catch(err=>console.error('QR error:',err));
-
-    // Copy‑to‑clipboard helper
-    function copyLnAddr(){
-      const raw = LN_ADDRESS.replace(/^lightning:/i,'');
-      navigator.clipboard.writeText(raw)
-        .then(()=>alert('Lightning address copied!'))
-        .catch(e=>console.error('Copy failed:',e));
-    }
-  </script>
-</body>
-</html>
+  // Encode the *raw* LNURL string (wallets understand this directly)
+  const canvas = document.getElementById('lnqr');
+  QRCode.toCanvas(canvas, LNURL, { width:180, color:{dark:"#ffffff",light:"#00000000"} })
+        .catch(err=>console.error('QR error:',err));
+</script>
+ 
