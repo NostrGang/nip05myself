@@ -89,17 +89,3 @@
   <strong>nostrgang@nostrgang.com</strong>
 </p>
 
-<!-- QR code (auto‑generated, no extra libs needed) -->
-<canvas id="lnqr" width="180" height="180" style="margin:auto;"></canvas>
-
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-<script>
-  // The LNURL‑Pay URL we stored in the DNS TXT record
-  const LNURL = "https://lnurl.alby.com/lnurlp/abcd1234efgh5678ijkl9012mnop3456qrst7890uvwx";
-
-  // Encode the *raw* LNURL string (wallets understand this directly)
-  const canvas = document.getElementById('lnqr');
-  QRCode.toCanvas(canvas, LNURL, { width:180, color:{dark:"#ffffff",light:"#00000000"} })
-        .catch(err=>console.error('QR error:',err));
-</script>
- 
