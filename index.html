@@ -1,10 +1,9 @@
-d<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>NostrGang – Pay with Lightning</title>
   <style>
-    /* -------------------- Page layout -------------------- */
     body{
       margin:0;
       font-family:'Helvetica Neue',Arial,sans-serif;
@@ -37,6 +36,31 @@ d<!DOCTYPE html>
       transition:.3s;
     }
     .btn:hover{background:#e56600;}
+
+    /* ------- QR‑code wrapper & copy button ------- */
+    .lnqr-wrapper{
+      margin-top:1.2rem;
+      text-align:center;
+    }
+    #lnqr-canvas{
+      width:150px;
+      height:150px;
+      margin:auto;
+      display:block;
+    }
+    .copy-btn{
+      margin-top:0.6rem;
+      background:#ff7c00;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      padding:0.4rem 0.9rem;
+      cursor:pointer;
+      font-size:0.9rem;
+      transition:background .2s;
+    }
+    .copy-btn:hover{background:#e56600;}
+
     .footer{
       margin-top:3rem;
       font-size:.9rem;
@@ -57,11 +81,37 @@ d<!DOCTYPE html>
   </p>
 
   <!-- ==== PAY NOW BUTTON ==== -->
-  <!-- Replace YOUR_LIGHTNING_ADDRESS with your actual Lightning invoice address (e.g. lnurl, lnbc…) -->
   <a class="btn" href="lightning:nostrgang@nostrgang.com">Pay Now</a>
+
+  <!-- ==== QUICK LIGHTNING QR CODE ==== -->
+  <div class="lnqr-wrapper">
+    <canvas id="lnqr-canvas" aria-label="Lightning QR code"></canvas>
+    <button class="copy-btn" onclick="copyLnAddr()">Copy address</button>
+  </div>
 
   <div class="footer">
     Built with love &amp; lightning | Nostr Gang
   </div>
+
+  <!-- QR‑code library (tiny CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script>
+    const LN_ADDRESS = "lightning:YOUR_LIGHTNING_ADDRESS"; // ← replace
+
+    // Render QR
+    const canvas = document.getElementById('lnqr-canvas');
+    QRCode.toCanvas(canvas, LN_ADDRESS, {
+      width:150,
+      color:{dark:"#ffffff",light:"#00000000"}
+    }).catch(err=>console.error('QR error:',err));
+
+    // Copy‑to‑clipboard helper
+    function copyLnAddr(){
+      const raw = LN_ADDRESS.replace(/^lightning:/i,'');
+      navigator.clipboard.writeText(raw)
+        .then(()=>alert('Lightning address copied!'))
+        .catch(e=>console.error('Copy failed:',e));
+    }
+  </script>
 </body>
 </html>
