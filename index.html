@@ -1,91 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>NostrGang – Pay with Lightning</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NOSTRGANG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <style>
-    body{
-      margin:0;
-      font-family:'Helvetica Neue',Arial,sans-serif;
-      background:linear-gradient(135deg,#2a0047,#ff7c00);
-      color:#fff;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      min-height:100vh;
-      text-align:center;
-      padding:2rem;
+    :root {
+      --bg: #060608;
+      --surface: #0d0d14;
+      --border: #1e1e2e;
+      --purple: #9d4edd;
+      --violet: #7b2fff;
+      --cyan: #00f5d4;
+      --text: #e0e0f0;
+      --muted: #5a5a7a;
+      --glow: rgba(157, 78, 221, 0.35);
     }
-    h1{font-size:3rem;margin-bottom:.5rem;}
-    p{
-      font-size:1.2rem;
-      max-width:600px;
-      margin-bottom:2rem;
-      line-height:1.5;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
     }
-    .btn{
-      background:#ff7c00;
-      color:#fff;
-      padding:.8rem 1.6rem;
-      border:none;
-      border-radius:8px;
-      font-size:1rem;
-      text-decoration:none;
-      cursor:pointer;
-      transition:.3s;
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.5;
     }
-    .btn:hover{background:#e56600;}
-
-    /* ------- QR‑code wrapper & copy button ------- */
-    .lnqr-wrapper{
-      margin-top:1.2rem;
-      text-align:center;
+    body::after {
+      content: '';
+      position: fixed;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(123, 47, 255, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
     }
-    #lnqr-canvas{
-      width:150px;
-      height:150px;
-      margin:auto;
-      display:block;
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(157, 78, 221, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(157, 78, 221, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: 0;
+      pointer-events: none;
     }
-    .copy-btn{
-      margin-top:0.6rem;
-      background:#ff7c00;
-      color:#fff;
-      border:none;
-      border-radius:6px;
-      padding:0.4rem 0.9rem;
-      cursor:pointer;
-      font-size:0.9rem;
-      transition:background .2s;
+    .container { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 0 24px; }
+    nav {
+      position: relative; z-index: 1; padding: 28px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      max-width: 860px; margin: 0 auto;
     }
-    .copy-btn:hover{background:#e56600;}
-
-    .footer{
-      margin-top:3rem;
-      font-size:.9rem;
-      color:#ddd;
-    }
-  </style>
-</head>
-
-<body>
-  <h1><span style="color:#ff7c00;">NostrGang</span></h1>
-
-  <p>
-    Get your own NIP‑05 address like <strong>yourname@nostrgang.com</strong> for just <strong>1,000 sats</strong>.
-  </p>
-
-  <p>
-    Send sats to <strong>nostrgang.com</strong> — click the button below and your wallet will create a fresh invoice automatically.
-  </p>
-
-  <!-- ==== PAY NOW BUTTON ==== -->
-  <a class="btn" href="lightning:nostrgang@nostrgang.com">Pay Now</a>
-
-  <!-- ---------- Lightning‑address (LNURL‑Pay) ---------- -->
-<p style="margin-top:1.5rem;">
-  ⚡️ Pay with your Lightning wallet by using the address<br>
-  <strong>nostrgang@nostrgang.com</strong>
-</p>
-
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: 0.15em; color: var(--text); }
+    .nav-logo span { color: var(--purple); }
+    .nav-tag { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; border: 1px solid var(--border); padding: 4px 10px; border-radius: 2px; }
+    .hero { position: relative; z-index: 1; padding: 80px 24px 60px; max-width: 860px; margin: 0 auto; }
+    .hero-eyebrow { font-size: 0.72rem; letter-spacing: 0.25em; color: var(--cyan);
